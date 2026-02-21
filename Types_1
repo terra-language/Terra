@@ -1,0 +1,61 @@
+🇺🇦 Terra 0.1: Складні оголошення та математичні функції
+1. Математичні функції етапу пре-компіляції
+Мова Terra підтримує вбудовані функції, які обробляються парсером ще до етапу компіляції. Це дозволяє оптимізувати виконання, підставляючи готові значення в код.
+    • /sqrt(value): Обчислює квадратний корінь.
+        ◦ Особливість: Якщо результат є дробовим, парсер автоматично відкидає дробову частину (integer truncation).
+    • /sum(v1, v2, ...): Обчислює суму довільної кількості аргументів.
+Приклади використання:
+Фрагмент коду
+app (/intbyte, /var) intbyte = 16
+app (/intbyte, /const) int = /sqrt(intbyte) ! Значення = 4
+app (/intbyte, /var) int2 = .None.
+
+! Складне вкладене обчислення:
+int2 (/sqrt(/sum(intbyte, int, 20))) ! Результат 6.32... стає 6
+2. Системи числення (лише для беззнакових типів)
+Terra дозволяє оголошувати значення у різних системах числення за допомогою префіксів:
+    • Двійкова: 0b (наприклад, 0b1100)
+    • Вісімкова: 0o (наприклад, 0o14)
+    • Шістнадцяткова: 0x (наприклад, 0xC)
+3. Вивід даних та форматування
+Функція /display використовується для виводу значень. За допомогою модифікаторів можна змінити представлення числа:
+    • /display(var) — стандартний десятковий вивід.
+    • /display(var(F)) — шістнадцятковий формат (Hex).
+    • /display(var(8)) — вісімковий формат.
+    • /display(var(2)) — двійковий формат.
+4. Регістронезалежність (Case Insensitivity)
+Terra є повністю регістронечутливою мовою. Ідентифікатори intbyte, Intbyte та INTBYTE розпізнаються лексером як одна й та сама сутність.
+5. Обмеження типів
+    • Типова поведінка: Операції дозволені лише між змінними однакового типу.
+    • Змішані типи: Взаємодія між різними типами даних (наприклад, /intbyte та /int4) можлива виключно за наявності активованого checklist всередині функцій.
+
+🇺🇸 Terra 0.1: Advanced Declarations and Mathematical Functions
+1. Pre-compilation Mathematical Functions
+Terra supports built-in functions evaluated by the parser during the pre-compilation stage. This optimizes performance by substituting constant values directly into the code.
+    • /sqrt(value): Calculates the square root.
+        ◦ Note: If the result is a floating-point number, the parser performs integer truncation (discards the fractional part).
+    • /sum(v1, v2, ...): Calculates the sum of multiple arguments.
+Examples:
+Фрагмент коду
+app (/intbyte, /var) intbyte = 16
+app (/intbyte, /const) int = /sqrt(intbyte) ! Evaluates to 4
+app (/intbyte, /var) int2 = .None.
+
+! Nested calculation example:
+int2 (/sqrt(/sum(intbyte, int, 20))) ! Result 6.32... is truncated to 6
+2. Number Systems (Unsigned Types Only)
+Terra supports various numerical bases using specific prefixes:
+    • Binary: 0b (e.g., 0b1100)
+    • Octal: 0o (e.g., 0o14)
+    • Hexadecimal: 0x (e.g., 0xC)
+3. Data Output and Formatting
+The /display function handles output. Representation can be modified using format tags:
+    • /display(var) — standard decimal output.
+    • /display(var(F)) — Hexadecimal format.
+    • /display(var(8)) — Octal format.
+    • /display(var(2)) — Binary format.
+4. Case Insensitivity
+The Terra language is case-insensitive. Identifiers such as intbyte, Intbyte, and INTBYTE are treated as the exact same variable by the lexer.
+5. Type Constraints
+    • Default Behavior: Operations are only permitted between variables of the same data type.
+    • Cross-type Operations: Interaction between different types (e.g., /intbyte and /int4) requires a defined checklist within the function scope.
