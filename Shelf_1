@@ -1,0 +1,363 @@
+
+🇺🇦 Terra 0.1: Операції з типом /shelf — трансформації та маніпуляції
+1. Операція /difference — обчислення різниць
+Опис
+Функція /difference обчислює різниці між сусідніми елементами масиву з заданим кроком. Результат містить різниці між елементами, розташованими на відстані step один від одного.
+Синтаксис
+/difference(Shelf(step::кроковий_інтервал))
+Параметри
+    • step::N — крок між елементами для обчислення різниці (за замовчуванням 1) 
+Приклади використання
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/display(/difference(Shelf(step::1)))
+Результат: 1, 1, 1, 1, 1, 1, 1, 1
+Пояснення: Кожен елемент результату — це різниця між поточним і попереднім елементом вхідного масиву:
+    • Результат[0] = Shelf[1] - Shelf[0] = 2 - 1 = 1 
+    • Результат[1] = Shelf[2] - Shelf[1] = 3 - 2 = 1 
+    • ...і так далі 
+
+2. Операція /mirror — дзеркальне відображення
+Опис
+Функція /mirror створює дзеркальне відображення масиву або його частини. Підтримує три режими роботи: відображення першої половини, другої половини або всього масиву.
+Синтаксис
+/mirror(Shelf)           ! Відображення всього масиву
+/mirror(Shelf(/s_half))  ! Відображення початкової половини
+/mirror(Shelf(/e_half))  ! Відображення кінцевої половини
+Параметри
+    • /s_half — відображення тільки початкової (start) половини масиву 
+    • /e_half — відображення тільки кінцевої (end) половини масиву 
+    • без параметра — відображення всього масиву 
+Приклади використання
+Відображення початкової половини
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf(/s_half))
+Результат: (5, 4, 3, 2, 1, 6, 7, 8, 9)
+Пояснення: Елементи 0-4 відображені дзеркально, елементи 5-8 залишилися незмінними.
+Відображення кінцевої половини
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf(/e_half))
+Результат: (1, 2, 3, 4, 9, 8, 7, 6, 5)
+Пояснення: Елементи 0-3 залишилися незмінними, елементи 4-8 відображені дзеркально.
+Відображення всього масиву
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf)
+Результат: (9, 8, 7, 6, 5, 4, 3, 2, 1)
+Пояснення: Повне дзеркальне відображення всіх елементів.
+
+3. Операція /ripple — хвильова зміна діапазону
+Опис
+Функція /ripple створює "хвильовий" ефект, модифікуючи послідовні групи елементів з можливістю зміни значень у часі. Підтримує різні режими підрахунку та розміри груп.
+Синтаксис
+/ripple(Shelf(step::розмір_кроку(кількість_повторів), count::напрямок))[початковий_індекс] + (значення)
+Параметри
+    • step::N(M) — розмір групи N і кількість повторів M 
+    • count::+1 — збільшення значення при кожному повторі 
+    • count::-1 — зменшення значення при кожному повторі 
+    • [початковий_індекс] — з якого індексу почати хвильовий ефект 
+    • + (значення) — базове значення для застосування 
+Приклади використання
+Приклад 1: Зменшення з кроком 2
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/ripple(Shelf(step::2(2), count::-1))[3] + (2)
+Результат: (1, 2, 3, 6, 7, 6, 7, 8, 9)
+Пояснення:
+    • Починаємо з індексу 3 
+    • Група розміром 2, повторюється 2 рази 
+    • Перша група [3,4]: +2 → (5,6) 
+    • Друга група [5,6]: +1 (зменшення) → (6,7) 
+    • Решта елементів без змін 
+Приклад 2: Збільшення з кроком 3
+app (/shelf, /intbyte, /var) Shelf = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+/ripple(Shelf(step::3(3), count::+1))[2] + (4)
+Результат: (0, 0, 4, 4, 4, 5, 5, 5, 6, 6, 6, 0, 0)
+Пояснення:
+    • Починаємо з індексу 2 
+    • Група розміром 3, повторюється 3 рази 
+    • Перша група [2,3,4]: +4 → (4,4,4) 
+    • Друга група [5,6,7]: +5 (збільшення) → (5,5,5) 
+    • Третя група [8,9,10]: +6 (збільшення) → (6,6,6) 
+Приклад 3: Зменшення з довгим кроком
+app (/shelf, /intbyte, /var) Shelf = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+/ripple(Shelf(step::1(4), count::-1))[3] + (-1)
+Результат: (0, 0, 0, -1, -2, -3, -4, 0, 0, 0, 0, 0, 0)
+Пояснення:
+    • Починаємо з індексу 3 
+    • Група розміром 1, повторюється 4 рази 
+    • Елемент [3]: -1 
+    • Елемент [4]: -2 (зменшення) 
+    • Елемент [5]: -3 (зменшення) 
+    • Елемент [6]: -4 (зменшення) 
+Приклад 4: Множення без підрахунку
+app (/shelf, /intbyte, /var) Shelf = (1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
+/ripple(Shelf(step::2(1)))[2] * (5)
+Результат: (1, 1, 10, 10, 3, 3, 4, 4, 5, 5)
+Пояснення:
+    • Одна група розміром 2, починаючи з індексу 2 
+    • Елементи [2,3] множаться на 5: (25, 25) = (10, 10) 
+Приклад 5: Множення зі збільшенням
+app (/shelf, /intbyte, /var) Shelf = (1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
+/ripple(Shelf(step::3(2), count::+1))[2] * (5)
+Результат: (1, 1, 10, 10, 15, 18, 24, 24, 5, 5)
+Пояснення:
+    • Перша група [2,3,4]: * 5 → (10, 10, 15) 
+    • Друга група [5,6,7]: * 6 (збільшення) → (18, 24, 24) 
+
+4. Циклічні зсуви масиву
+Опис
+Операції циклічного зсуву дозволяють обертати елементи масиву вліво або вправо на задану кількість позицій. Елементи, що виходять за межі масиву, з'являються з протилежного боку.
+Синтаксис
+Shelf + (Shelf)[-N]  ! Зсув вправо на N позицій
+Shelf + (Shelf)[+N]  ! Зсув вліво на N позицій
+Параметри
+    • [-N] — зсув вправо (від'ємний індекс) 
+    • [+N] — зсув вліво (додатній індекс) 
+    • N — кількість позицій для зсуву 
+Приклади використання
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5)
+Зсув вправо на 1 позицію
+Shelf + (Shelf)[-1]
+Результат: (1, 2, 3, 4, 5) += (5, 1, 2, 3, 4)
+Пояснення: Останній елемент переміщується на початок.
+Зсув вправо на 2 позиції
+Shelf + (Shelf)[-2]
+Результат: (1, 2, 3, 4, 5) += (4, 5, 1, 2, 3)
+Пояснення: Два останні елементи переміщуються на початок.
+Зсув вліво на 1 позицію
+Shelf + (Shelf)[+1]
+Результат: (1, 2, 3, 4, 5) += (2, 3, 4, 5, 1)
+Пояснення: Перший елемент переміщується в кінець.
+Зсув вліво на 3 позиції
+Shelf + (Shelf)[+3]
+Результат: (1, 2, 3, 4, 5) += (4, 5, 1, 2, 3)
+Пояснення: Перші три елементи переміщуються в кінець.
+
+5. Операція /echo — створення ехо-ефекту
+Опис
+Функція /echo створює ефект відлуння (ехо), генеруючи затухаючі копії вхідного масиву. Підтримує налаштування кроку, коефіцієнта затухання та можливість комбінування з іншими масивами.
+Синтаксис
+/echo(Shelf(step::крок, decay::коефіцієнт_затухання))
+/echo(Shelf(decay::коефіцієнт_затухання))
+/echo(Shelf(step::крок, decay::коефіцієнт_затухання), ЦільовийShelf)
+Параметри
+    • step::N — кількість нульових елементів перед кожним ехо (за замовчуванням 0) 
+    • decay::K — коефіцієнт затухання (множник для кожного наступного ехо) 
+    • ЦільовийShelf — необов'язковий базовий масив для комбінування з ехо 
+Приклади використання
+Приклад 1: Ехо з кроком і затуханням
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::1, decay::0.5))
+Результат: (0, 50, 45, 40, 35, 30)
+Пояснення:
+    • Один нульовий елемент на початку (step::1) 
+    • Кожне значення помножене на 0.5 
+Приклад 2: Ехо без кроку
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(decay::0.5))
+Результат: (50, 45, 40, 35, 30)
+Пояснення:
+    • Без нульових елементів 
+    • Пряме затухання на 0.5 
+Приклад 3: Ехо з великим кроком
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.1))
+Результат: (0, 0, 0, 10, 9, 8, 7, 6)
+Пояснення:
+    • Три нульові елементи на початку 
+    • Сильне затухання (0.1) 
+Приклад 4: Ехо з базовим масивом
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.1), Shelf)
+Результат: (100, 90, 80, 80, 69, 8, 7, 6)
+Пояснення:
+    • Перші 3 елементи залишаються з Shelf 
+    • Далі накладається ехо-ефект з оригінальними значеннями 
+Приклад 5: Ехо з іншим базовим масивом
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) Shelf1 = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.2), Shelf1)
+Результат: (1, 1, 1, 21, 19, 17, 15, 13, 1, 1, 1)
+Пояснення:
+    • Базовий масив Shelf1 заповнений одиницями 
+    • З індексу 3 накладається ехо з Shelf (множене на 0.2), додане до Shelf1 
+    • Решта елементів залишаються з Shelf1 
+🇺🇸 Terra 0.1: /shelf Operations — Transformations and Manipulations
+1. /difference Operation — Computing Differences
+Description
+The /difference function computes differences between adjacent array elements with a specified step. The result contains differences between elements located at a distance of step from each other.
+Syntax
+/difference(Shelf(step::step_interval))
+Parameters
+    • step::N — step between elements for difference computation (default 1) 
+Usage Examples
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/display(/difference(Shelf(step::1)))
+Result: 1, 1, 1, 1, 1, 1, 1, 1
+Explanation: Each result element is the difference between the current and previous element of the input array:
+    • Result[0] = Shelf[1] - Shelf[0] = 2 - 1 = 1 
+    • Result[1] = Shelf[2] - Shelf[1] = 3 - 2 = 1 
+    • ...and so on 
+
+2. /mirror Operation — Mirror Reflection
+Description
+The /mirror function creates a mirror reflection of an array or its part. Supports three modes: reflecting the first half, second half, or the entire array.
+Syntax
+/mirror(Shelf)           ! Mirror entire array
+/mirror(Shelf(/s_half))  ! Mirror starting half
+/mirror(Shelf(/e_half))  ! Mirror ending half
+Parameters
+    • /s_half — mirror only the starting (start) half of the array 
+    • /e_half — mirror only the ending (end) half of the array 
+    • no parameter — mirror the entire array 
+Usage Examples
+Mirroring Starting Half
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf(/s_half))
+Result: (5, 4, 3, 2, 1, 6, 7, 8, 9)
+Explanation: Elements 0-4 are mirrored, elements 5-8 remain unchanged.
+Mirroring Ending Half
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf(/e_half))
+Result: (1, 2, 3, 4, 9, 8, 7, 6, 5)
+Explanation: Elements 0-3 remain unchanged, elements 4-8 are mirrored.
+Mirroring Entire Array
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/mirror(Shelf)
+Result: (9, 8, 7, 6, 5, 4, 3, 2, 1)
+Explanation: Complete mirror reflection of all elements.
+
+3. /ripple Operation — Wave Range Modification
+Description
+The /ripple function creates a "wave" effect, modifying sequential groups of elements with the ability to change values over time. Supports different counting modes and group sizes.
+Syntax
+/ripple(Shelf(step::step_size(repeat_count), count::direction))[start_index] + (value)
+Parameters
+    • step::N(M) — group size N and repeat count M 
+    • count::+1 — increment value with each repeat 
+    • count::-1 — decrement value with each repeat 
+    • [start_index] — from which index to start the wave effect 
+    • + (value) — base value to apply 
+Usage Examples
+Example 1: Decrement with Step 2
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+/ripple(Shelf(step::2(2), count::-1))[3] + (2)
+Result: (1, 2, 3, 6, 7, 6, 7, 8, 9)
+Explanation:
+    • Start from index 3 
+    • Group size 2, repeated 2 times 
+    • First group [3,4]: +2 → (5,6) 
+    • Second group [5,6]: +1 (decrement) → (6,7) 
+    • Remaining elements unchanged 
+Example 2: Increment with Step 3
+app (/shelf, /intbyte, /var) Shelf = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+/ripple(Shelf(step::3(3), count::+1))[2] + (4)
+Result: (0, 0, 4, 4, 4, 5, 5, 5, 6, 6, 6, 0, 0)
+Explanation:
+    • Start from index 2 
+    • Group size 3, repeated 3 times 
+    • First group [2,3,4]: +4 → (4,4,4) 
+    • Second group [5,6,7]: +5 (increment) → (5,5,5) 
+    • Third group [8,9,10]: +6 (increment) → (6,6,6) 
+Example 3: Decrement with Long Step
+app (/shelf, /intbyte, /var) Shelf = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+/ripple(Shelf(step::1(4), count::-1))[3] + (-1)
+Result: (0, 0, 0, -1, -2, -3, -4, 0, 0, 0, 0, 0, 0)
+Explanation:
+    • Start from index 3 
+    • Group size 1, repeated 4 times 
+    • Element [3]: -1 
+    • Element [4]: -2 (decrement) 
+    • Element [5]: -3 (decrement) 
+    • Element [6]: -4 (decrement) 
+Example 4: Multiplication Without Counting
+app (/shelf, /intbyte, /var) Shelf = (1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
+/ripple(Shelf(step::2(1)))[2] * (5)
+Result: (1, 1, 10, 10, 3, 3, 4, 4, 5, 5)
+Explanation:
+    • One group of size 2, starting from index 2 
+    • Elements [2,3] multiplied by 5: (25, 25) = (10, 10) 
+Example 5: Multiplication with Increment
+app (/shelf, /intbyte, /var) Shelf = (1, 1, 2, 2, 3, 3, 4, 4, 5, 5)
+/ripple(Shelf(step::3(2), count::+1))[2] * (5)
+Result: (1, 1, 10, 10, 15, 18, 24, 24, 5, 5)
+Explanation:
+    • First group [2,3,4]: * 5 → (10, 10, 15) 
+    • Second group [5,6,7]: * 6 (increment) → (18, 24, 24) 
+
+4. Cyclic Array Shifts
+Description
+Cyclic shift operations allow rotating array elements left or right by a specified number of positions. Elements that go beyond array boundaries appear from the opposite side.
+Syntax
+Shelf + (Shelf)[-N]  ! Shift right by N positions
+Shelf + (Shelf)[+N]  ! Shift left by N positions
+Parameters
+    • [-N] — shift right (negative index) 
+    • [+N] — shift left (positive index) 
+    • N — number of positions to shift 
+Usage Examples
+app (/shelf, /intbyte, /var) Shelf = (1, 2, 3, 4, 5)
+Shift Right by 1 Position
+Shelf + (Shelf)[-1]
+Result: (1, 2, 3, 4, 5) += (5, 1, 2, 3, 4)
+Explanation: Last element moves to the beginning.
+Shift Right by 2 Positions
+Shelf + (Shelf)[-2]
+Result: (1, 2, 3, 4, 5) += (4, 5, 1, 2, 3)
+Explanation: Two last elements move to the beginning.
+Shift Left by 1 Position
+Shelf + (Shelf)[+1]
+Result: (1, 2, 3, 4, 5) += (2, 3, 4, 5, 1)
+Explanation: First element moves to the end.
+Shift Left by 3 Positions
+Shelf + (Shelf)[+3]
+Result: (1, 2, 3, 4, 5) += (4, 5, 1, 2, 3)
+Explanation: First three elements move to the end.
+
+5. /echo Operation — Creating Echo Effect
+Description
+The /echo function creates an echo effect, generating decaying copies of the input array. Supports step configuration, decay coefficient, and the ability to combine with other arrays.
+Syntax
+/echo(Shelf(step::step, decay::decay_coefficient))
+/echo(Shelf(decay::decay_coefficient))
+/echo(Shelf(step::step, decay::decay_coefficient), TargetShelf)
+Parameters
+    • step::N — number of zero elements before each echo (default 0) 
+    • decay::K — decay coefficient (multiplier for each subsequent echo) 
+    • TargetShelf — optional base array to combine with echo 
+Usage Examples
+Example 1: Echo with Step and Decay
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::1, decay::0.5))
+Result: (0, 50, 45, 40, 35, 30)
+Explanation:
+    • One zero element at the beginning (step::1) 
+    • Each value multiplied by 0.5 
+Example 2: Echo Without Step
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(decay::0.5))
+Result: (50, 45, 40, 35, 30)
+Explanation:
+    • No zero elements 
+    • Direct decay by 0.5 
+Example 3: Echo with Large Step
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.1))
+Result: (0, 0, 0, 10, 9, 8, 7, 6)
+Explanation:
+    • Three zero elements at the beginning 
+    • Strong decay (0.1) 
+Example 4: Echo with Base Array
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.1), Shelf)
+Result: (100, 90, 80, 80, 69, 8, 7, 6)
+Explanation:
+    • First 3 elements remain from Shelf 
+    • Echo effect overlaid with original values afterward 
+Example 5: Echo with Different Base Array
+app (/shelf, /intbyte, /var) Shelf = (100, 90, 80, 70, 60)
+app (/shelf, /intbyte, /var) Shelf1 = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+app (/shelf, /intbyte, /var) EchoShelf = /echo(Shelf(step::3, decay::0.2), Shelf1)
+Result: (1, 1, 1, 21, 19, 17, 15, 13, 1, 1, 1)
+Explanation:
+    • Base array Shelf1 filled with ones 
+    • From index 3, echo from Shelf (multiplied by 0.2) is added to Shelf1 
+    • Remaining elements stay from Shelf1 
